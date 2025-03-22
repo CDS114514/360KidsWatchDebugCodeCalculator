@@ -3,16 +3,11 @@ from Crypto.Util.Padding import pad
 import base64
 import hashlib
 
-def encrypt(key, iv, data):
-    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
-    return cipher.encrypt(pad(data.encode('utf-8'), AES.block_size))
-
 def encrypt_aes_base64(key, iv, data):
-    encrypted_data = encrypt(key, iv, data)
-    return base64.b64encode(encrypted_data).decode('utf-8')
+    return base64.b64encode(AES.new(key.encode(), AES.MODE_CBC, iv.encode()).encrypt(pad(data.encode(), AES.block_size))).decode()
 
 def md5_encode(param_string):
-    return hashlib.md5(param_string.encode('utf-8')).hexdigest()
+    return hashlib.md5(param_string.encode()).hexdigest()
 
 def generate_key(str1, str2, hard_code):
     return md5_encode(''.join(sorted([str1, str2, md5_encode(hard_code)])))
@@ -40,9 +35,10 @@ def main():
                 qr_code = input("请输入QRCode: ")
                 hard_code = input("请输入HardCode: ")
                 str1, str2 = imei, qr_code
-            print("调试模式密码:", get_code("develop_mode_code", str1, str2, hard_code))
-            print("工厂模式密码:", get_code("factory_mode_code", str1, str2, hard_code))
-            break
+            print("调试模式密码:", get_code("develop_mode_code", str1, str2, hard_code), "\n工厂模式密码:", get_code("factory_mode_code", str1, str2, hard_code))
+            print("按下回车键退出程序...")
+            input()
+            break 
         except ValueError:
             print("输入错误，请输入数字。")
 
